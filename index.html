@@ -3,264 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Stars Classifier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Football test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            font-family: 'Inter', sans-serif;
-            color: #fff;
-            overflow-x: hidden;
+        :root {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --accent-green: #00ff73;
+            --btn-color: #ff0055;
+            --btn-hover: #ff3377;
         }
 
         body {
-            background: radial-gradient(ellipse at top, #1e1b4b 0%, #0f0c29 40%, #000000 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            text-align: center;
+            margin: 0;
             padding: 20px;
-            position: relative;
-        }
-
-        body::before,
-        body::after {
-            content: "";
-            position: fixed;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.35;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        body::before {
-            background: #7c3aed;
-            top: -150px;
-            left: -150px;
-            animation: float 12s ease-in-out infinite;
-        }
-
-        body::after {
-            background: #06b6d4;
-            bottom: -150px;
-            right: -150px;
-            animation: float 14s ease-in-out infinite reverse;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50%      { transform: translate(60px, 40px) scale(1.1); }
-        }
-
-        .app {
-            position: relative;
-            z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 24px;
-            max-width: 600px;
-            width: 100%;
-            padding-bottom: 40px;
+            min-height: 100vh;
         }
 
         h1 {
-            font-weight: 800;
-            font-size: 2.2rem;
-            letter-spacing: -0.02em;
-            background: linear-gradient(90deg, #a78bfa, #22d3ee);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-align: center;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
-        .subtitle {
-            color: #a1a1aa;
-            font-size: 1rem;
-            margin-top: -14px;
-            text-align: center;
-        }
-
-        #webcam-container {
-            width: 360px;
-            height: 360px;
-            max-width: 90vw;
-            max-height: 90vw;
-            border-radius: 28px;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow:
-                0 20px 60px rgba(124, 58, 237, 0.35),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+        #app-container {
             display: flex;
+            flex-direction: column;
             align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        #media-container {
+            display: flex;
             justify-content: center;
-            backdrop-filter: blur(10px);
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            min-height: 250px;
         }
 
         #webcam-container canvas {
-            width: 100% !important;
-            height: 100% !important;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 255, 115, 0.2);
+            border: 3px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        #player-image {
+            width: 200px;
+            height: 200px;
             object-fit: cover;
-            border-radius: 28px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+            display: none;
+            border: 3px solid var(--accent-green);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
         #label-container {
-            width: 100%;
             display: flex;
             flex-direction: column;
             gap: 10px;
+            margin-top: 10px;
+            width: 100%;
         }
 
-        #label-container > div {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 14px 20px;
-            border-radius: 14px;
-            font-size: 1.15rem;
-            font-weight: 600;
-            letter-spacing: 0.01em;
+        .label-row {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: #222;
+            padding: 15px 25px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(8px);
-            transition: all 0.25s ease;
         }
 
-        #label-container > div:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(4px);
-        }
-
-        #label-container > div span.prob {
-            font-variant-numeric: tabular-nums;
-            color: #22d3ee;
-            font-weight: 800;
+        .highlight {
+            color: var(--accent-green);
+            background: rgba(0, 255, 115, 0.1);
+            border: 2px solid var(--accent-green);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 115, 0.4);
+            font-size: 2.2rem;
+            font-weight: 900;
         }
 
         button {
-            font-family: inherit;
-            font-size: 1.15rem;
-            font-weight: 700;
-            padding: 16px 48px;
+            margin-top: 30px;
+            padding: 20px 60px;
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: white;
+            background-color: var(--btn-color);
             border: none;
-            border-radius: 999px;
+            border-radius: 50px;
             cursor: pointer;
-            color: #fff;
-            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
-            box-shadow:
-                0 10px 30px rgba(124, 58, 237, 0.5),
-                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            letter-spacing: 0.02em;
+            box-shadow: 0 10px 20px rgba(255, 0, 85, 0.4);
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                0 15px 40px rgba(236, 72, 153, 0.6),
-                0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+            background-color: var(--btn-hover);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 25px rgba(255, 0, 85, 0.6);
         }
 
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .status {
-            color: #a1a1aa;
-            font-size: 0.9rem;
-            min-height: 20px;
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <div class="app">
-        <h1>⚽ Football Stars Classifier</h1>
-        <p class="subtitle">Teachable Machine · Real-time recognition</p>
-
-        <div id="webcam-container"></div>
-
-        <button type="button" id="start-btn" onclick="init(this)">▶ Start</button>
-        <div class="status" id="status">Нажмите кнопку, чтобы запустить камеру</div>
-
+    <h1>Football Test</h1>
+    
+    <div id="app-container">
+        <div id="media-container">
+            <div id="webcam-container"></div>
+            <img id="player-image" src="" alt="Футболист">
+        </div>
+        
         <div id="label-container"></div>
+        
+        <button type="button" id="start-btn" onclick="init()">Start</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
     <script type="text/javascript">
-        // Ссылка на твою модель Teachable Machine
         const URL = "https://teachablemachine.withgoogle.com/models/DGLZUzcE5/";
 
+        const playersData = {
+            "GARACHO": {
+                img: "https://www.shutterstock.com/editorial/image-editorial/M1TfU93fM2D7E643MjY3MzM=/alejandro-garnacho-chelsea-440nw-15544941ac.jpg",
+                voice: "донер кебаб начо алехандро гарнчо"
+            },
+            "RONALDO": {
+                img: "https://i.pinimg.com/originals/6f/06/03/6f0603153db8f791e347dda3f5e6f582.jpg",
+                voice: "суууууууууууууууууууууууууууууууууууууууууууууууууууууууууууууууууу"
+            },
+            "MATVEY SAFONOV": {
+                img: "https://img.championat.com/oB_5UM2ac7jD991bAwYyAljLhGQ-bBDEMCDJ0N09Va0/p(q:0)/news/big/g/j/matvej-safonov-podelilsya-vpechatleniyami-ot-prazdnovaniya-pobedy-v-lige-chempionov_1780418486508681364.jpg",
+                voice: "ну что хейтеры что сейчас скажите"
+            },
+            "NEYMAR JR": {
+                img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/BRASIL_5_MAV_%28Neymar_celebrating%29_%28cropped%29.jpg/250px-BRASIL_5_MAV_%28Neymar_celebrating%29_%28cropped%29.jpg",
+                voice: "наймар джуниор сантос"
+            },
+            "MESSI": {
+                img: "https://s0.rbk.ru/v6_top_pics/media/img/9/96/756713803974969.jpg",
+                voice: "ун кара месси месси месси месси месси месси ун кара месси месси месси"
+            }
+        };
+
         let model, webcam, labelContainer, maxPredictions;
+        let currentWinner = ""; 
 
-        async function init(btn) {
-            const statusEl = document.getElementById('status');
-            try {
-                btn.disabled = true;
-                statusEl.textContent = "Загрузка модели...";
+        async function init() {
+            let utterance = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(utterance);
 
-                const modelURL = URL + "model.json";
-                const metadataURL = URL + "metadata.json";
+            document.getElementById("start-btn").style.display = "none";
 
-                model = await tmImage.load(modelURL, metadataURL);
-                maxPredictions = model.getTotalClasses();
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
 
-                const flip = true;
-                webcam = new tmImage.Webcam(360, 360, flip);
-                await webcam.setup();
-                await webcam.play();
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
 
-                window.requestAnimationFrame(loop);
+            const flip = true; 
+            webcam = new tmImage.Webcam(250, 250, flip); 
+            await webcam.setup(); 
+            await webcam.play();
+            window.requestAnimationFrame(loop);
 
-                document.getElementById("webcam-container").appendChild(webcam.canvas);
-                labelContainer = document.getElementById("label-container");
-                labelContainer.innerHTML = "";
-                for (let i = 0; i < maxPredictions; i++) {
-                    labelContainer.appendChild(document.createElement("div"));
-                }
-
-                statusEl.textContent = "Классификация активна";
-                btn.style.display = "none";
-            } catch (err) {
-                console.error(err);
-                statusEl.textContent = "Ошибка: " + err.message;
-                btn.disabled = false;
+            document.getElementById("webcam-container").appendChild(webcam.canvas);
+            
+            labelContainer = document.getElementById("label-container");
+            for (let i = 0; i < maxPredictions; i++) {
+                let div = document.createElement("div");
+                div.className = "label-row";
+                labelContainer.appendChild(div);
             }
         }
 
         async function loop() {
-            webcam.update();
+            webcam.update(); 
             await predict();
             window.requestAnimationFrame(loop);
         }
 
         async function predict() {
             const prediction = await model.predict(webcam.canvas);
+            
+            let highestProb = 0;
+            let highestClass = "";
+            let highestIndex = 0;
+
             for (let i = 0; i < maxPredictions; i++) {
-                const pred = prediction[i];
-                const prob = (pred.probability * 100).toFixed(1) + "%";
-                labelContainer.childNodes[i].innerHTML =
-                    `<span>${pred.className}</span><span class="prob">${prob}</span>`;
+                if (prediction[i].probability > highestProb) {
+                    highestProb = prediction[i].probability;
+                    highestClass = prediction[i].className;
+                    highestIndex = i;
+                }
             }
+
+            for (let i = 0; i < maxPredictions; i++) {
+                const percent = Math.round(prediction[i].probability * 100);
+                labelContainer.childNodes[i].innerHTML = `<span>${prediction[i].className}</span> <span>${percent}%</span>`;
+                
+                // Подсвечиваем класс зеленым цветом, если уверенность больше 25% (0.25)
+                if (i === highestIndex && highestProb > 0.25) {
+                    labelContainer.childNodes[i].classList.add("highlight");
+                } else {
+                    labelContainer.childNodes[i].classList.remove("highlight");
+                }
+            }
+
+            // Запускаем эффекты (звук, фото, конфетти), если уверенность больше 25%
+            if (highestProb > 0.25) {
+                if (highestClass !== currentWinner) {
+                    currentWinner = highestClass;
+                    triggerEffects(highestClass);
+                }
+            // Сбрасываем текущего футболиста, только если уверенность падает ниже 10%
+            } else if (highestProb < 0.10) {
+                currentWinner = "";
+                document.getElementById("player-image").style.display = "none";
+            }
+        }
+
+        function triggerEffects(className) {
+            let matchedKey = Object.keys(playersData).find(key => className.toUpperCase().includes(key.toUpperCase()));
+            
+            if (matchedKey) {
+                const data = playersData[matchedKey];
+                
+                const imgEl = document.getElementById("player-image");
+                imgEl.src = data.img;
+                imgEl.style.display = "block";
+
+                speak(data.voice);
+                shootFootballConfetti();
+            }
+        }
+
+        function speak(text) {
+            window.speechSynthesis.cancel(); 
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ru-RU'; 
+            msg.rate = 1.0;     
+            msg.pitch = 1.0;    
+            window.speechSynthesis.speak(msg);
+        }
+
+        function shootFootballConfetti() {
+            const scalar = 3;
+            const football = confetti.shapeFromText({ text: '⚽', scalar });
+
+            confetti({
+                shapes: [football],
+                particleCount: 40,
+                spread: 100,
+                origin: { y: 0.6 },
+                scalar: 2,
+                ticks: 150
+            });
+            
+            confetti({
+                particleCount: 30,
+                spread: 120,
+                origin: { y: 0.6 },
+                colors: ['#FFD700', '#00FF73', '#FFFFFF']
+            });
         }
     </script>
 </body>
